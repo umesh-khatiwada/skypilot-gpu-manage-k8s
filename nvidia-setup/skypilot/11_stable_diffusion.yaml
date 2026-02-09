@@ -1,0 +1,25 @@
+# 11_stable_diffusion.yaml
+envs:
+  HF_TOKEN:
+
+resources:
+  infra: k8s/default
+  accelerators: RTX4060:1
+  cpus: 4
+  memory: 16+
+
+setup: |
+  pip install diffusers transformers accelerate torch
+
+run: |
+  python -c "
+  from diffusers import StableDiffusionPipeline
+  import torch
+  pipe = StableDiffusionPipeline.from_pretrained(
+      'stabilityai/stable-diffusion-2-1-base',
+      torch_dtype=torch.float16).to('cuda')
+  image = pipe('a photo of a cat astronaut on the moon', num_inference_steps=25).images[0]
+  image.save('cat_astronaut.png')
+  print('Image saved to cat_astronaut.png')
+  "
+

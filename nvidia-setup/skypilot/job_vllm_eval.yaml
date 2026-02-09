@@ -1,0 +1,18 @@
+# job_vllm_eval.yaml
+envs:
+  MODEL_NAME: Qwen/Qwen2.5-1.5B-Instruct
+  HF_TOKEN: ""
+
+resources:
+  infra: k8s/default
+  accelerators: RTX4060:1
+  cpus: 4
+  memory: 16+
+
+run: |
+  python -c "
+  import time
+  print('Starting eval on GPU...')
+  time.sleep(5)
+  print('Done!')"
+

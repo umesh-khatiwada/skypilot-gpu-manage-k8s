@@ -1,0 +1,16 @@
+# 12_jupyter.yaml
+resources:
+  infra: k8s/default
+  accelerators: RTX4060:1
+  cpus: 4
+  memory: 16+
+  ports: 8888
+
+setup: |
+  pip install jupyterlab torch torchvision matplotlib
+
+run: |
+  jupyter lab --ip=0.0.0.0 --port=8888 --no-browser \
+    --NotebookApp.token='skypilot' \
+    --allow-root
+

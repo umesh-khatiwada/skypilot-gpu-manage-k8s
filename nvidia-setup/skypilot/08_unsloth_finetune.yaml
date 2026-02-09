@@ -1,0 +1,30 @@
+# 08_unsloth_finetune.yaml
+envs:
+  HF_TOKEN:
+
+resources:
+  infra: k8s/default
+  accelerators: RTX4060:1
+  cpus: 4
+  memory: 16+
+
+setup: |
+  pip install "unsloth[colab-new] @ git+https://github.com/unslothai/unsloth.git"
+  pip install --no-deps trl peft accelerate bitsandbytes datasets
+
+run: |
+  python -c "
+  from unsloth import FastLanguageModel
+  import torch
+  model, tokenizer = FastLanguageModel.from_pretrained(
+      model_name='unsloth/tinyllama-bnb-4bit',
+      max_seq_length=2048,
+      load_in_4bit=True,
+  )
+  model = FastLanguageModel.get_peft_model(model, r=16, lora_alpha=16,
+      target_modules=['q_proj','k_proj','v_proj','o_proj'],
+      lora_dropout=0, bias='none', use_gradient_checkpointing=True)
+  print('Model loaded and LoRA applied successfully!')
+  print(f'GPU memory used: {torch.cuda.memory_allocated()/1024**3:.2f} GB')
+  "
+

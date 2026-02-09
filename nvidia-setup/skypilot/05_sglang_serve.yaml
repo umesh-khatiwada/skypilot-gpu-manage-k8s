@@ -1,0 +1,20 @@
+# 05_sglang_serve.yaml
+envs:
+  MODEL_NAME: Qwen/Qwen2.5-1.5B-Instruct
+
+resources:
+  infra: k8s/default
+  accelerators: RTX4060:1
+  cpus: 4
+  memory: 16+
+  ports: 30000
+
+setup: |
+  pip install "sglang[all]"
+
+run: |
+  python -m sglang.launch_server \
+    --model-path $MODEL_NAME \
+    --port 30000 \
+    --mem-fraction-static 0.85
+

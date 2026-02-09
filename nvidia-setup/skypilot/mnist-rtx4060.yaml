@@ -1,0 +1,18 @@
+# Single-node MNIST on your local K3s RTX 4060
+
+resources:
+  infra: k8s/default       # your context is 'default'
+  accelerators: RTX4060:1  # match exactly what sky show-gpus prints
+  cpus: 4                  # adjust for your box
+  memory: 16+              # GiB; adjust for your box
+
+workdir: ~/torch_examples
+
+setup: |
+  cd mnist
+  pip install -r requirements.txt
+
+run: |
+  cd mnist
+  python main.py --epochs 1
+

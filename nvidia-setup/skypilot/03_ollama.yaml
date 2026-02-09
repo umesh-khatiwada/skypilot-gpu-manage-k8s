@@ -1,0 +1,17 @@
+# 03_ollama.yaml
+resources:
+  infra: k8s/default
+  accelerators: RTX4060:1
+  cpus: 4
+  memory: 16+
+  ports: 11434
+
+setup: |
+  curl -fsSL https://ollama.com/install.sh | sh
+
+run: |
+  ollama serve &
+  sleep 10
+  ollama pull phi3:mini
+  ollama run phi3:mini "What is Kubernetes in 3 sentences?"
+

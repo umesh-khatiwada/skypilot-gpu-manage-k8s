@@ -1,0 +1,17 @@
+# 14_managed_job.yaml
+resources:
+  infra: k8s/default
+  accelerators: RTX4060:1
+  cpus: 4
+  memory: 16+
+
+workdir: ~/torch_examples
+
+setup: |
+  cd mnist
+  pip install -r requirements.txt
+
+run: |
+  cd mnist
+  python main.py --epochs 5
+

@@ -1,0 +1,20 @@
+name: do-cpu-test
+
+resources:
+  cloud: do
+  region: tor1
+  instance_type: s-1vcpu-1gb  # Explicitly specify CPU droplet
+  # OR use resource requirements:
+  # cpus: 2
+  # memory: 4+
+
+workdir: .
+
+run: |
+  echo "Running on DigitalOcean CPU droplet"
+  python3 - << 'PYEOF'
+    import time
+    print("Start job on DO CPU droplet...")
+    time.sleep(30)
+    print("Job done, exiting.")
+  PYEOF

@@ -1,0 +1,15 @@
+# example: 04_vllm_serve_nohf.yaml
+envs:
+  MODEL_NAME: Qwen/Qwen2.5-1.5B-Instruct
+  HF_TOKEN: ""              # as before, explicit empty
+
+resources:
+  infra: k8s/default
+  accelerators: RTX4060:1
+  cpus: 4
+  memory: 16+
+  ports: 8081
+  autostop:
+    idle_minutes: 0        # trigger immediately after job idle
+    down: true             # fully delete cluster instead of stop
+

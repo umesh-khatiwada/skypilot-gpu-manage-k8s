@@ -1,0 +1,17 @@
+resources:
+  cloud: do
+  region: tor1
+  accelerators: RTX6000:1
+  cpus: 4+
+  memory: 16+
+
+workdir: ~/torch_examples
+
+setup: |
+  cd mnist
+  pip install -r requirements.txt
+
+run: |
+  cd mnist
+  python main.py --epochs 1
+

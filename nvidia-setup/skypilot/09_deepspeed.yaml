@@ -1,0 +1,40 @@
+# 09_deepspeed.yaml
+resources:
+  infra: k8s/default
+  accelerators: RTX4060:1
+  cpus: 4
+  memory: 16+
+
+setup: |
+  pip install deepspeed torch torchvision
+
+run: |
+  cat > ds_config.json << 'EOF'
+  {"train_batch_size": 16, "fp16": {"enabled": true},
+   "zero_optimization": {"stage": 2}}
+  EOF
+
+  cat > train_cifar.py << 'PYEOF'
+  import torch, torchvision, deepspeed, argparse
+  parser = argparse.ArgumentParser()
+  parser = deepspeed.add_config_arguments(parser)
+  args = parser.parse_args()
+  transform = torchvision.transforms.Compose([
+      torchvision.transforms.ToTensor(),
+      torchvision.transforms.Normalize((0.5,0.5,0.5),(0.5,0.5,0.5))])
+  trainset = torchvision.datasets.CIFAR10(root='./data', train=True, download=True, transform=transform)
+  model = torchvision.models.resnet18(num_classes=10)
+  engine, _, loader, _ = deepspeed.initialize(
+      args=args, model=model,
+      training_data=trainset, config='ds_config.json')
+  for epoch in range(2):
+      for i, (x, y) in enumerate(loader):
+          x, y = x.to(engine.device), y.to(engine.device)
+          loss = torch.nn.functional.cross_entropy(engine(x), y)
+          engine.backward(loss)
+          engine.step()
+          if i % 100 == 0: print(f"Epoch {epoch} Step {i} Loss {loss.item():.4f}")
+  PYEOF
+
+  deepspeed --num_gpus=1 train_cifar.py --deepspeed_config ds_config.json
+

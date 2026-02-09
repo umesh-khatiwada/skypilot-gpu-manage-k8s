@@ -1,0 +1,31 @@
+# 13_skyserve.yaml
+envs:
+  MODEL_NAME: Qwen/Qwen2.5-1.5B-Instruct
+
+service:
+  replicas: 1
+  readiness_probe:
+    path: /v1/chat/completions
+    post_data:
+      model: $MODEL_NAME
+      messages:
+        - role: user
+          content: Hello!
+      max_tokens: 1
+
+resources:
+  infra: k8s/default
+  accelerators: RTX4060:1
+  cpus: 4
+  memory: 16+
+  ports: 8081
+
+setup: |
+  pip install vllm
+
+run: |
+  vllm serve $MODEL_NAME \
+    --port 8081 \
+    --max-model-len 2048 \
+    --gpu-memory-utilization 0.90
+

@@ -1,0 +1,32 @@
+# 15_vector_db.yaml
+resources:
+  infra: k8s/default
+  accelerators: RTX4060:1
+  cpus: 4
+  memory: 16+
+
+setup: |
+  pip install torch transformers pillow chromadb datasets
+
+run: |
+  python -c "
+  import torch, chromadb
+  from transformers import CLIPModel, CLIPProcessor
+  model = CLIPModel.from_pretrained('openai/clip-vit-base-patch32').cuda()
+  processor = CLIPProcessor.from_pretrained('openai/clip-vit-base-patch32')
+
+  texts = ['a dog playing fetch', 'a cat sleeping', 'a car on highway',
+           'a mountain landscape', 'a cup of coffee']
+  inputs = processor(text=texts, return_tensors='pt', padding=True).to('cuda')
+  with torch.no_grad():
+      embeds = model.get_text_features(**inputs).cpu().numpy()
+
+  client = chromadb.Client()
+  col = client.create_collection('demo')
+  col.add(embeddings=embeds.tolist(), documents=texts, ids=[f'id{i}' for i in range(len(texts))])
+
+  results = col.query(query_embeddings=embeds[0:1].tolist(), n_results=3)
+  print('Query: a dog playing fetch')
+  print('Top matches:', results['documents'])
+  "
+
