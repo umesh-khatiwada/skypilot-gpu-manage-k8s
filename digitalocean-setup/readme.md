@@ -29,22 +29,23 @@ sky check
 sky launch digitalocean-setup/skypilot/do-test.yaml
 ```
 
-## 5. Auto-shutdown Examples
-To save costs, you should ensure instances are stopped or deleted after work.
+## 5. Auto-shutdown using Flags
+The most common way to ensure instances are deleted after a task is to use flags with the `sky launch` command.
 
-### Method A: Managed Jobs (Recommended for auto-termination)
-SkyPilot's job system automatically terminates the instance once the task finishes:
+### Method A: Auto-down (Terminates cluster immediately after task)
+Recommended for one-off tasks where you don't need to keep the cluster for debugging:
 ```bash
-sky jobs launch -n my-job digitalocean-setup/skypilot/do-ephemeral.yaml
+sky launch digitalocean-setup/skypilot/do-test.yaml --down
 ```
 
 ### Method B: Autostop (Stops instance after idle time)
-This stops the instance if it's idle for 10 minutes:
+Best for development. It stops the instance if it remains idle for 10 minutes (prevents billing while idle, but keeps the disk):
 ```bash
-sky launch -c my-cluster digitalocean-setup/skypilot/do-test.yaml --idle-minutes-to-autostop 10
+sky launch digitalocean-setup/skypilot/do-test.yaml -i 10
 ```
 
-### Method C: Auto-down (Terminates cluster after task)
+### Method C: Managed Jobs (Advanced)
+Automatically terminates the instance once the job finishes:
 ```bash
-sky launch -c my-ephemeral-cluster digitalocean-setup/skypilot/do-test.yaml --down
+sky jobs launch digitalocean-setup/skypilot/do-ephemeral.yaml
 ```
