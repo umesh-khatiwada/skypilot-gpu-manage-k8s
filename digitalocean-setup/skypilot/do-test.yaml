@@ -1,0 +1,14 @@
+name: do-test-cpu
+
+resources:
+  cloud: digitalocean
+  instance_type: s-1vcpu-2gb  # Smallest standard instance
+  region: nyc1
+
+setup: |
+  echo "Setting up DO instance..."
+
+run: |
+  echo "Hello from DigitalOcean!"
+  uname -a
+  lscpu | grep "Model name"
