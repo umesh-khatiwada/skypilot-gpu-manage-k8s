@@ -1,0 +1,12 @@
+name: do-ephemeral-job
+
+resources:
+  cloud: do
+  cpus: 1+
+  memory: 1+
+  disk_size: 25
+
+run: |
+  echo "Executing a heavy task on DigitalOcean..."
+  sleep 30
+  echo "Task completed. SkyPilot will now terminate this instance automatically if launched as a job."
