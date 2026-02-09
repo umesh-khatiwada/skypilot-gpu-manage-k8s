@@ -1,9 +1,10 @@
 name: do-test-cpu
 
 resources:
-  cloud: digitalocean
-  instance_type: s-1vcpu-2gb  # Smallest standard instance
-  region: nyc1
+  cloud: do
+  cpus: 1+
+  memory: 1+
+  disk_size: 25
 
 setup: |
   echo "Setting up DO instance..."
