@@ -1,0 +1,33 @@
+name: distributed-amd-training
+
+num_nodes: 1 # Scale this up for multi-node
+
+resources:
+  cloud: kubernetes
+  accelerators: MI300X:1
+  cpus: 16
+  memory: 128+
+  image_id: docker:rocm/pytorch:latest
+
+# Useful for DDP: enable communication between nodes
+envs:
+  NCCL_DEBUG: INFO
+  RCCL_DEBUG: INFO # AMD specific debug flag
+
+setup: |
+  # Setup code here
+  echo "Setting up distributed environment..."
+
+run: |
+  # Using torchrun for automatic rank/world_size assignment
+  # Note: --nproc_per_node should match number of GPUs per node
+  torchrun --nproc_per_node=host \
+           --nnodes=\$SKYPILOT_NUM_NODES \
+           --node_rank=\$SKYPILOT_NODE_RANK \
+           --master_addr=\$SKYPILOT_NODE_IPS \
+           --master_port=12345 \
+           python3 -c "import torch; \
+                       import torch.distributed as dist; \
+                       dist.init_process_group('nccl'); \
+                       print(f'Rank {dist.get_rank()} of {dist.get_world_size()} on {torch.cuda.get_device_name(0)} initialized'); \
+                       dist.destroy_process_group()"

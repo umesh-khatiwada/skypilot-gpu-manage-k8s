@@ -155,11 +155,14 @@ Verify that Kubernetes detects the AMD GPUs:
 kubectl get nodes -o custom-columns=NAME:.metadata.name,GPUs:.status.capacity.'amd\.com/gpu'
 ```
 
-Expected output:
-```
-NAME                                            GPUs
-np-bdd12851-1.us-east1-a.compute.internal      8
-```
+### Verified System Details (MI300X)
+
+Based on diagnostic runs:
+- **GPU Model**: AMD Instinct MI300X VF
+- **VRAM**: ~191 GB (205,822,885,888 Bytes) per GPU
+- **GFX Version**: gfx942
+- **VBIOS**: 113-M3000100-103
+- **ROCm Status**: Verified with PyTorch (ROCm/CUDA available: True)
 
 ## SkyPilot AMD Integration
 
@@ -237,16 +240,49 @@ run: |
 sky launch amd-minGPT.yaml
 ```
 
-### Monitor Job Status
+## High-Level SkyPilot Features on AMD
+
+The MI300X supports all of SkyPilot's advanced orchestration features.
+
+### 1. Managed Jobs (Fault-Tolerance)
+Managed jobs automatically restart on failure and can be queued.
 
 ```bash
-sky status
+# Launch as a managed job
+sky jobs launch skypilot_tasks/managed_train_amd.yaml
 ```
 
-### View Job Logs
+- **Resilience**: If a node fails, SkyPilot re-schedules the job.
+- **Monitoring**: `sky jobs dashboard` or `sky jobs logs <job_id>`.
+
+### 2. Sky Serve (Model Serving)
+Scale your inference API across multiple MI300X nodes.
 
 ```bash
-sky logs <job-name>
+# Spin up a model serving endpoint
+sky serve up skypilot_tasks/serve_amd.yaml
+```
+
+- **Auto-scaling**: Scale replicas based on traffic (QPS).
+- **Endpoint**: Get your service URL with `sky serve status`.
+
+### 3. Data Management
+Sync local code and large datasets automatically.
+
+```yaml
+# In your task YAML:
+workdir: ./my_project  # Syncs local folder to task
+file_mounts:
+  /data:
+    source: s3://my-dataset # Syncs S3 bucket to MI300X local storage
+```
+
+### 4. Distributed Training
+Scale to multi-node/multi-GPU clusters using RCCL.
+
+```bash
+# Launch on multi-node cluster
+sky launch skypilot_tasks/distributed_amd.yaml
 ```
 
 ## Troubleshooting

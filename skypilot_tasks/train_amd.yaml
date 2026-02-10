@@ -1,0 +1,34 @@
+name: mi300x-diagnosis
+
+resources:
+  cloud: kubernetes
+  image_id: docker:rocm/pytorch:latest
+  accelerators: MI300X:1
+  cpus: 4
+  memory: 16+
+
+setup: |
+  pip install --upgrade pip
+  # rocm-smi is usually pre-installed in rocm/pytorch images
+
+run: |
+  echo "=== ROCm SMI Overview ==="
+  rocm-smi
+  
+  echo ""
+  echo "=== GPU Details ==="
+  rocm-smi --showhw
+  rocm-smi --showproductname
+  rocm-smi --showserial
+  rocm-smi --showvbios
+  
+  echo ""
+  echo "=== Memory Info ==="
+  rocm-smi --showmeminfo vram
+  
+  echo ""
+  echo "=== PyTorch Verification ==="
+  python3 -c "import torch; print(f'ROCm/CUDA available: {torch.cuda.is_available()}'); \
+    print(f'Device count: {torch.cuda.device_count()}'); \
+    print(f'Current device: {torch.cuda.current_device()}'); \
+    print(f'Device name: {torch.cuda.get_device_name(0)}')"

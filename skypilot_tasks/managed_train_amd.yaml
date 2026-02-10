@@ -1,0 +1,38 @@
+name: managed-amd-train
+
+resources:
+  cloud: kubernetes
+  accelerators: MI300X:1
+  cpus: 8
+  memory: 32+
+  image_id: docker:rocm/pytorch:latest
+
+# Working directory to sync local code
+workdir: .
+
+setup: |
+  echo "Installing dependencies..."
+  pip install --upgrade pip
+  # Add any research dependencies here
+
+run: |
+  echo "Starting managed training job on MI300X..."
+  # Simulate a training loop that checkpoints
+  python3 <<EOF
+  import torch
+  import time
+  import os
+
+  print(f"Using device: {torch.cuda.get_device_name(0)}")
+  
+  # Simulate saving a checkpoint
+  os.makedirs("checkpoints", exist_ok=True)
+  for i in range(1, 11):
+      print(f"Training epoch {i}/10...")
+      time.sleep(2)  # Simulate work
+      with open(f"checkpoints/epoch_{i}.pt", "w") as f:
+          f.write(f"Checkpoint data for epoch {i}")
+      print(f"Saved checkpoint {i}")
+
+  print("Training complete!")
+  EOF
