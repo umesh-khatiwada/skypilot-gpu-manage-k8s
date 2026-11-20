@@ -59,17 +59,30 @@ sky show-gpus --infra k8s
 
 ```
 .
-├── skypilot_tasks/
-│   ├── train.yaml                  # NVIDIA basic training
-│   ├── train_amd.yaml             # AMD basic diagnostics ✅
-│   ├── managed_train_amd.yaml     # AMD managed jobs ✅
-│   ├── serve_amd.yaml             # AMD model serving ✅
-│   └── distributed_amd.yaml       # AMD distributed training ✅
-├── amd-setup/
-│   ├── readme.md                  # Detailed AMD setup guide
-│   └── diag-pod.yaml             # Direct ROCm diagnostics
-└── readme.md                      # This file
+├── skypilot_tasks/            # Top-level example tasks (train.yaml = NVIDIA; *_amd.yaml = AMD)
+│   ├── train.yaml
+│   ├── train_amd.yaml
+│   ├── managed_train_amd.yaml
+│   ├── serve.yaml
+│   ├── serve_amd.yaml
+│   └── distributed_amd.yaml
+├── amd-setup/                 # AMD GPU Operator / ROCm setup guide + diag-pod.yaml
+├── nvidia-setup/              # NVIDIA GPU Operator setup guide, time-slicing config, RTX 4060 resource
+│   └── skypilot/              # Numbered example tasks (smoke test, vLLM, Ollama, SGLang, Jupyter, ...)
+├── digitalocean-setup/        # DigitalOcean API token setup + test tasks
+├── kubernetes/                # Placeholder readme (TODO: no content yet)
+└── readme.md                  # This file
 ```
+
+## Setup Guides
+
+| Target | Guide |
+|--------|-------|
+| AMD (MI300X) | [amd-setup/readme.md](amd-setup/readme.md) |
+| NVIDIA | [nvidia-setup/readme.md](nvidia-setup/readme.md) |
+| DigitalOcean | [digitalocean-setup/readme.md](digitalocean-setup/readme.md) |
+
+The NVIDIA example tasks live in [nvidia-setup/skypilot/](nvidia-setup/skypilot/) (for example `02_gpu_smoke.yaml`, `03_ollama.yaml`, `04_vllm_serve.yaml`, `05_sglang_serve.yaml`, `12_jupyter.yaml`, `13_skyserve.yaml`, `14_managed_job.yaml`). Tokens such as `HF_TOKEN` are left empty in these files; pass them at launch time (for example with `--env`) and never commit real values.
 
 ## Usage Examples
 
@@ -215,7 +228,7 @@ kubectl logs amd-gpu-diag
 
 ## Documentation
 
-- **AMD Setup Guide**: See [amd-setup/readme.md](amd-setup/readme.md)
+- **Setup guides**: see the [Setup Guides](#setup-guides) table above
 - **SkyPilot Docs**: https://skypilot.readthedocs.io/
 - **ROCm Docs**: https://rocm.docs.amd.com/
 
@@ -228,10 +241,14 @@ Contributions welcome! Please ensure:
 
 ## License
 
-This project is licensed under the MIT License.
+This project is licensed under the MIT License. See [LICENSE](LICENSE).
 
 ## Acknowledgments
 
 - SkyPilot team for the excellent framework
 - AMD for ROCm and MI300X support
 - Kubernetes GPU Operator maintainers
+
+## Author
+
+Umesh Khatiwada - [@umesh-khatiwada](https://github.com/umesh-khatiwada)
